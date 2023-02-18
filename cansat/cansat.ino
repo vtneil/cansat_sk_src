@@ -40,8 +40,8 @@ Constants
 Device Attributes
 */
 #define _DEVICE_ID 1
-#define _BASE_FREQUENCY 420E6
-#define _DEVICE_FREQUENCY (_BASE_FREQUENCY + (_DEVICE_ID - 1) * 9E6)
+#define _BASE_FREQUENCY ((int32_t) 420E6)
+#define _DEVICE_FREQUENCY (_BASE_FREQUENCY + (_DEVICE_ID - 1) * ((int32_t) 9E6))
 
 /*
 Pins Definitions
@@ -198,6 +198,7 @@ void setup() {
     digitalWrite(_LED_R, LOW);
     digitalWrite(_LED_G, HIGH);
   }
+
   delay(1000);
   digitalWrite(_LED_G, LOW);
   digitalWrite(_LED_R, LOW);
@@ -350,13 +351,13 @@ void setup() {
 Loop
 */
 void loop() {
-  if (millis() - runtime > 550) {
-    /*
+  /*
     Read GPS Values
-    */
-    while (ss.available())
+  */
+  while (ss.available())
       gps.encode(ss.read());
 
+  if (millis() - runtime > 550) {
     if (gps.location.isValid()) {
       readings.lat = gps.location.lat();
       readings.lon = gps.location.lng();
@@ -377,8 +378,6 @@ void loop() {
     readings.batt = 0.00483 * ((double)analogRead(_BATT_ADC));
 
     craft_message(packet, readings);
-    // Serial.println(readings.alt_bar);
-    Serial.println(packet);
 
     /*
     LCD Screen Debug
@@ -397,10 +396,13 @@ void loop() {
     /*
     Begin LoRa Transmission
     */
+    Serial.print("Echo back: ");
+    Serial.println(packet);
+
     LoRa.beginPacket();
     LoRa.print(packet);
-    LoRa.endPacket();
-
+    LoRa.endPacket(true);
+    
     /*
     Activate LED and Buzzer Flash
     */

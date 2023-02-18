@@ -27,7 +27,7 @@ vivatsathorn@outlook.co.th (Vivatsathorn Thitasirivit, vtneil)
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-#define _BASE_FREQUENCY 420E6
+#define _BASE_FREQUENCY ((int32_t) 420E6)
 
 #define GPSTX 4
 #define GPSRX 2
@@ -42,7 +42,7 @@ vivatsathorn@outlook.co.th (Vivatsathorn Thitasirivit, vtneil)
 #define LCDaddress 0x27
 #define DEVICENAME "GS01"
 #define _DEVICE_ID ((DEVICENAME[2] - '0') * 10 + (DEVICENAME[3] - '0'))
-#define DEVICEFREQ (_BASE_FREQUENCY + (_DEVICE_ID - 1) * 9E6)
+#define DEVICEFREQ (_BASE_FREQUENCY + (_DEVICE_ID - 1) * ((int32_t) 9E6))
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 bool runonlyonce = true;
@@ -99,7 +99,7 @@ void setup() {
   delay(500);
   Beep(100);
   LoRa.setPins(LORASS, LORARST, LORAD0);
-  if (!LoRa.begin(420E6)) {
+  if (!LoRa.begin(DEVICEFREQ)) {
     selfcheckLORA = false;
     lcd.setCursor(2, 2);
     lcd.print(F(" Status:FAILED "));
